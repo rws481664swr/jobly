@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { createToken } = require("../express-app/util/tokens");
-const { SECRET_KEY } = require("../express-app/util/config");
+const { createToken } = require("./tokens");
+const { SECRET_KEY } = require("../config");
 
 describe("createToken", function () {
   test("works: not admin", function () {

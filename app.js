@@ -5,12 +5,12 @@
 const express = require("express");
 const cors = require("cors");
 
-const { NotFoundError } = require("./express-app/util/expressError");
+const { NotFoundError } = require("./expressError");
 
-const { authenticateJWT } = require("./express-app/middleware/auth");
-const authRoutes = require("./express-app/routes/auth");
-const companiesRoutes = require("./express-app/routes/companies");
-const usersRoutes = require("./express-app/routes/users");
+const { authenticateJWT } = require("./middleware/auth");
+const authRoutes = require("./routes/auth");
+const companiesRoutes = require("./routes/companies");
+const usersRoutes = require("./routes/users");
 
 const morgan = require("morgan");
 
@@ -28,7 +28,8 @@ app.use("/users", usersRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
-  return next(new NotFoundError());
+  const err=new NotFoundError()
+  return next(err);
 });
 
 /** Generic error handler; anything unhandled goes here. */

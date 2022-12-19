@@ -6,11 +6,11 @@ const jsonschema = require("jsonschema");
 
 const express = require("express");
 const { ensureLoggedIn } = require("../middleware/auth");
-const { BadRequestError } = require("../util/expressError");
-const User = require("../db/models/user");
-const { createToken } = require("../util/tokens");
-const userNewSchema = require("../db/schemas/userNew.json");
-const userUpdateSchema = require("../db/schemas/userUpdate.json");
+const { BadRequestError } = require("../expressError");
+const User = require("../models/user");
+const { createToken } = require("../helpers/tokens");
+const userNewSchema = require("../schemas/userNew.json");
+const userUpdateSchema = require("../schemas/userUpdate.json");
 
 const router = express.Router();
 

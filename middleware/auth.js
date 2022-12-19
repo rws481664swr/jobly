@@ -3,8 +3,8 @@
 /** Convenience middleware to handle common auth cases in routes. */
 
 const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../util/config");
-const { UnauthorizedError } = require("../util/expressError");
+const { SECRET_KEY } = require("../config");
+const { UnauthorizedError } = require("../expressError");
 
 
 /** Middleware: Authenticate user.

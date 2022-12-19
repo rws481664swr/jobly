@@ -2,9 +2,9 @@
 
 const request = require("supertest");
 
-const db = require("../db/db.js");
-const app = require("../../app");
-const User = require("../db/models/user");
+const db = require("../db.js");
+const app = require("../app");
+const User = require("../models/user");
 
 const {
   commonBeforeAll,
