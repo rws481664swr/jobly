@@ -5,6 +5,7 @@ const { getDatabaseUri } = require("./config");
 
 let db;
 
+/* istanbul ignore next */
 if (process.env.NODE_ENV === "production") {
   db = new Client({
     connectionString: getDatabaseUri(),
