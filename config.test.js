@@ -1,5 +1,7 @@
 "use strict";
 
+process.env.NODE_ENV = "test"
+
 describe("config can come from env", function () {
   test("works", function() {
     process.env.SECRET_KEY = "abc";
