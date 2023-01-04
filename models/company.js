@@ -76,7 +76,6 @@ class Company {
             SELECT handle, name, description, logo_url as "logoUrl"  ${addCount ? ', num_employees as "numEmployees"' : ''}
             FROM companies  ${whereClause}
             ORDER BY name`
-        console.log(whereClause,args)
         const {rows} = await db.query( query, args);
         return rows;
     }

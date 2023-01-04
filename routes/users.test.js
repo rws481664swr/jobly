@@ -1,5 +1,7 @@
 "use strict";
 
+process.env.NODE_ENV = "test"
+
 const request = require("supertest");
 
 const db = require("../db.js");
@@ -119,6 +121,13 @@ describe("GET /users", function () {
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.body).toEqual({
       users: [
+          {
+              "email": "admin@user.com",
+              "firstName": "admin",
+              "isAdmin": true,
+              "lastName": "user",
+              "username": "admin"
+          },
         {
           username: "u1",
           firstName: "U1F",
@@ -140,6 +149,7 @@ describe("GET /users", function () {
           email: "user3@user.com",
           isAdmin: false,
         },
+
       ],
     });
   });
