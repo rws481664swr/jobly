@@ -20,5 +20,12 @@ if (process.env.NODE_ENV === "production") {
 }
 
 db.connect();
-
-module.exports = db;
+const query= async (query, params=[] ) => {
+   try{
+     return await db.query(query,params)
+   }catch (e){
+     console.log('QUERY: ',query)
+     throw e
+   }
+}
+module.exports = { query};
