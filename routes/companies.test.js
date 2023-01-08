@@ -14,6 +14,7 @@ const {
     commonAfterAll,
     u1Token, adminToken,
 } = require("./_testCommon");
+const Job = require("../models/job");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -299,6 +300,8 @@ describe("GET /companies", function () {
 
 describe("GET /companies/:handle", function () {
     test("works for anon", async function () {
+        await db.query(`INSERT INTO jobs (company_handle,equity,salary,title) 
+        values ('c1','0',4494,'title')`)
         const resp = await request(app).get(`/companies/c1`);
         expect(resp.body).toEqual({
             company: {
@@ -307,11 +310,21 @@ describe("GET /companies/:handle", function () {
                 description: "Desc1",
                 numEmployees: 1,
                 logoUrl: "http://c1.img",
+                jobs:[
+                    {
+                        companyHandle:'c1',
+                        equity:'0',
+                        salary:4494,
+                        title:'title',
+                        id:expect.any(Number)
+                    }
+                ]
             },
         });
     });
 
     test("works for anon: company w/o jobs", async function () {
+        await Job.create({title:'title2',salary:10,equity: '0.100',companyHandle:'c2'})
         const resp = await request(app).get(`/companies/c2`);
         expect(resp.body).toEqual({
             company: {
@@ -320,6 +333,9 @@ describe("GET /companies/:handle", function () {
                 description: "Desc2",
                 numEmployees: 2,
                 logoUrl: "http://c2.img",
+                jobs:[
+                    {id:expect.any(Number),title:'title2',salary:10,equity: '0.100',companyHandle:'c2'}
+                ]
             },
         });
     });

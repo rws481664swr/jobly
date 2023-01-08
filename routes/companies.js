@@ -4,7 +4,7 @@
 
 const jsonschema = require("jsonschema");
 const express = require("express");
-const validateQueryParams= require('../helpers/validateFilterQueryParams')
+const validateQueryParams = require('../helpers/validateFilterQueryParams')
 const {BadRequestError} = require("../expressError");
 const {ensureLoggedIn, ensureAdmin} = require("../middleware/auth");
 const Company = require("../models/company");
@@ -14,7 +14,7 @@ const companyUpdateSchema = require("../schemas/companyUpdate.json");
 
 const router = new express.Router();
 
-
+const db = require('../db')
 /** POST / { company } =>  { company }
  *
  * company should be { handle, name, description, numEmployees, logoUrl }
@@ -50,9 +50,9 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: none
  */
 
-router.get("/",async function ({query}, res, next) {
+router.get("/", async function ({query}, res, next) {
     try {
-         query = validateQueryParams(query)
+        query = validateQueryParams(query)
         const companies = await Company.findAll(query);
         return res.json({companies});
     } catch (err) {
@@ -68,10 +68,13 @@ router.get("/",async function ({query}, res, next) {
  * Authorization required: none
  */
 
-router.get("/:handle", async function (req, res, next) {
+router.get("/:handle", async function ({params: {handle}}, res, next) {
     try {
-        const company = await Company.get(req.params.handle);
-        return res.json({company});
+        const company = await Company.get(handle);
+        const {rows: jobs} = await db.query(`SELECT id, title, salary, equity, company_handle as "companyHandle"
+                                             FROM jobs
+                                             WHERE company_handle = $1`, [handle])
+        return res.json({company: {...company, jobs}});
     } catch (err) {
         return next(err);
     }

@@ -11,7 +11,7 @@ module.exports = class Job {
                 RETURNING id, title, salary, equity,company_handle as "companyHandle"`, [title, salary, equity, companyHandle])
             return {job}
         } catch (e) {
-            throw new BadRequestError()
+            throw new BadRequestError(e.message)
         }
     }
 
@@ -54,9 +54,11 @@ module.exports = class Job {
     }
 
     static async remove(id) {
-        await db.query(`DELETE
+
+        const {rows:[row]}= await db.query(`DELETE
                         FROM jobs
-                        where id = $1`, [id])
+                        where id = $1 RETURNING *`, [id])
+        if (!row)throw new NotFoundError()
     }
 }
 
