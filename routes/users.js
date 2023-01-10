@@ -29,7 +29,6 @@ const router = express.Router();
 
 router.post("/", ensureAdmin, async function (req, res, next) {
     try {
-        console.log('asdf'.bgYellow)
         const validator = jsonschema.validate(req.body, userNewSchema);
         if (!validator.valid) {
             const errs = validator.errors.map(e => e.stack);
@@ -118,6 +117,20 @@ router.delete("/:username", ensureAdminOrLoggedInUser, async function (req, res,
         return next(err);
     }
 });
+
+
+/**
+ * route /users/:username/jobs/:id
+ *
+ */
+router.post(`/:username/jobs/:id`, ensureAdminOrLoggedInUser, async ({params: {username, id}}, res, next) => {
+    try {
+         await User.apply(username,id)
+        return res.status(200).json({applied:id})
+    }catch (e) {
+        return next(e)
+    }
+})
 
 
 module.exports = router;
