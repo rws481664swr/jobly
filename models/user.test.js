@@ -1,18 +1,20 @@
 "use strict";
 
 const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
+    NotFoundError,
+    BadRequestError,
+    UnauthorizedError,
 } = require("../expressError");
-const db = require("../db.js");
+
+const {db} = require("../db/db.js");
 const User = require("./user.js");
 const {
-  commonBeforeAll,
-  commonBeforeEach,
-  commonAfterEach,
-  commonAfterAll,
+    commonBeforeAll,
+    commonBeforeEach,
+    commonAfterEach,
+    commonAfterAll,
 } = require("./_testCommon");
+const Job = require("./job");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);

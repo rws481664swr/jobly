@@ -1,4 +1,4 @@
-const db = require("../db");
+const {db} = require("../db/db");
 const {adminToken} = require("./_testCommon");
 const request = require("supertest");
 const app = require("../app");
@@ -9,7 +9,7 @@ const deleteFromCompanies = async () => await db.query(` DELETE
 module.exports = (root)=>({
     deleteFromJobs,
     deleteFromCompanies,
-    $: {
+    request: {
 
         async create(payload, token = adminToken) {
             return await request(app).post(`/${root}`).send(payload).set("authorization", `Bearer ${token}`)

@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test'
-const db = require('../db')
+const {db} = require('../db/db')
 const Company = require('./company')
 const Job = require('./job')
 const {NotFoundError} = require("../expressError");
@@ -23,6 +23,7 @@ beforeEach(async () => {
     job3 = (await db.query(`INSERT INTO jobs (title, salary, equity, company_handle)
                            VALUES ('job3', 100000, '0', 'c0')
                            RETURNING  id,title,salary,equity,company_handle as "companyHandle"`)).rows[0]
+
 
 })
 afterEach(async () => {

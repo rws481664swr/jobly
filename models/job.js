@@ -1,5 +1,5 @@
 const {sqlForPartialUpdate} = require("../helpers/sql");
-const db = require('../db')
+const {db} = require('../db/db')
 const {BadRequestError, NotFoundError} = require("../expressError");
 module.exports = class Job {
 

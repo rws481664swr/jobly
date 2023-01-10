@@ -4,7 +4,7 @@ process.env.NODE_ENV = "test"
 
 const request = require("supertest");
 
-const db = require("../db.js");
+const {db} = require("../db/db.js");
 const app = require("../app");
 const User = require("../models/user");
 
@@ -148,11 +148,9 @@ describe("POST /users", function () {
 
 describe("GET /users", function () {
     test("works for admin", async function () {
-        console.log('POST'.bgYellow)
         const resp = await request(app)
             .get("/users")
             .set("authorization", `Bearer ${adminToken}`);
-        console.log('END POST'.bgYellow)
         expect(resp.body).toEqual({
             users: [
                 {
@@ -160,7 +158,8 @@ describe("GET /users", function () {
                     "firstName": "admin",
                     "isAdmin": true,
                     "lastName": "user",
-                    "username": "admin"
+                    "username": "admin",
+                    jobs:[]
                 },
                 {
                     username: "u1",
@@ -168,6 +167,7 @@ describe("GET /users", function () {
                     lastName: "U1L",
                     email: "user1@user.com",
                     isAdmin: false,
+                    jobs:[]
                 },
                 {
                     username: "u2",
@@ -175,6 +175,7 @@ describe("GET /users", function () {
                     lastName: "U2L",
                     email: "user2@user.com",
                     isAdmin: false,
+                    jobs:[expect.any(Number)]
                 },
                 {
                     username: "u3",
@@ -182,6 +183,7 @@ describe("GET /users", function () {
                     lastName: "U3L",
                     email: "user3@user.com",
                     isAdmin: false,
+                    jobs:[]
                 },
 
             ],
@@ -226,6 +228,7 @@ describe("GET /users/:username", function () {
                 lastName: "U1L",
                 email: "user1@user.com",
                 isAdmin: false,
+                jobs:[]
             },
         });
     });
@@ -241,6 +244,7 @@ describe("GET /users/:username", function () {
                 lastName: "U1L",
                 email: "user1@user.com",
                 isAdmin: false,
+                jobs:[]
             },
         });
     });
@@ -249,7 +253,6 @@ describe("GET /users/:username", function () {
         const resp = await request(app)
             .get(`/users/u2`)
             .set("authorization", `Bearer ${u1Token}`);
-        console.log(resp.bgYellow)
         expect(resp.statusCode).toEqual(401);
 
     });
