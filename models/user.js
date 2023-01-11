@@ -103,18 +103,27 @@ class User {
    **/
 
   static async findAll() {
-    const result = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           ORDER BY username`,
-    );
+    const {rows: result} = await db.query(
+        `SELECT u.username,
+                    first_name                        AS "firstName",
+                    last_name                         AS "lastName",
+                    email,
+                    is_admin                          AS "isAdmin",
+                    array_agg(job_id ORDER BY job_id) as jobs
 
-    return result.rows;
+             FROM users u
+                      LEFT JOIN applications a on u.username = a.username
+             GROUP BY u.username, first_name, last_name, email, is_admin
+             ORDER BY username`,
+    );
+    result.forEach(
+        (row) => {
+          row.jobs = row.jobs.filter( e => !!e)
+          return row
+        })
+    return result
   }
+
 
   /** Given a username, return data about user.
    *
@@ -124,25 +133,24 @@ class User {
    * Throws NotFoundError if user not found.
    **/
 
+
   static async get(username) {
-    const userRes = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           WHERE username = $1`,
-        [username],
-    );
-
-    const user = userRes.rows[0];
-
-    if (!user) throw new NotFoundError(`No user: ${username}`);
-
-    return user;
+    const {rows: [user]} = await db.query(`
+            SELECT u.username,
+                   first_name                        AS "firstName",
+                   last_name                         AS "lastName",
+                   email,
+                   is_admin                          AS "isAdmin",
+                   array_agg(job_id ORDER BY job_id) as jobs
+            FROM users u
+                    LEFT JOIN applications a on u.username = a.username
+            WHERE u.username = $1
+            GROUP BY u.username, first_name, last_name, email, is_admin
+        `, [username])
+    if (!user) throw new NotFoundError()
+    user.jobs = user.jobs.filter (e=>!!e)
+    return user
   }
-
   /** Update user data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain
@@ -204,6 +212,13 @@ class User {
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
+  }
+
+
+
+  static async apply(username, id) {
+    await db.query(`INSERT INTO applications (username, job_id)
+                        VALUES ($1, $2)`, [username, id])
   }
 }
 

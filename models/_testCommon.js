@@ -31,6 +31,8 @@ async function commonBeforeAll() {
 }
 
 async function commonBeforeEach() {
+  await db.query(`DELETE FROM applications`);
+  await db.query(`DELETE FROM jobs`);
   await db.query("BEGIN");
 }
 
