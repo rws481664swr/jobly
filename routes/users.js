@@ -120,6 +120,9 @@ router.delete("/:username", ensureAdminOrLoggedInUser, async function (req, res,
 
 
 /**
+ *
+ * Apply for a job(:id) as a user(:username)
+ * Can either be admin or the user (:username)
  * route /users/:username/jobs/:id
  *
  */

@@ -3,6 +3,10 @@ const {db} = require('../db/db')
 const {BadRequestError, NotFoundError} = require("../expressError");
 module.exports = class Job {
 
+    /**
+     * create A job from object.
+     * returns job object with an id for it in the database
+     */
     static async create({title, salary, equity, companyHandle}) {
         try {
             const {rows: [job]} = await db.query(`
@@ -15,6 +19,9 @@ module.exports = class Job {
         }
     }
 
+    /**
+     * gets all jobs. can pass filters
+     */
     static async findAll(filters) {
         const {where, vals} = createFilterWhereClause(filters)
 
@@ -26,6 +33,9 @@ module.exports = class Job {
 
     }
 
+    /**
+     * get job by id
+     */
     static async get(id) {
         const {rows: [job]} = await db.query(`
             SELECT id,title,salary,equity,company_handle as "companyHandle"
@@ -36,6 +46,9 @@ module.exports = class Job {
         return {job}
     }
 
+    /**
+     * Update job given id and key value pairs to update
+     */
     static async update(id, data) {
         const {rows: [row]} = await db.query(`SELECT *
                                               FROM jobs
@@ -53,6 +66,9 @@ module.exports = class Job {
 
     }
 
+    /**
+     * remove job by id from database
+     */
     static async remove(id) {
 
         const {rows:[row]}= await db.query(`DELETE
@@ -62,13 +78,18 @@ module.exports = class Job {
     }
 }
 
+/**
+ * generate filter SQL and params for `findAll` function
+ */
 function createFilterWhereClause(filters) {
     let where = ''
     let vals = []
+
+    //if filters OBJ/arguments[0] is empty
     if (!filters || !Object.keys(filters).length)
         return {where, vals}
     const {title, minSalary, hasEquity} = filters
-    where = []
+    where = [] //query params
     let i = 1
     if (title) {
         where.push(`title ILIKE $${i++} `)
@@ -82,7 +103,8 @@ function createFilterWhereClause(filters) {
         where.push(`equity != '0'`)
     }
     where = 'WHERE ' + where.join(' AND ')
-    if (!hasEquity && !vals.length) where = ''
+
+    if (!hasEquity && !vals.length) where = '' // if no filters
 
     return {where, vals}
 

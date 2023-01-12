@@ -7,6 +7,9 @@ const {BadRequestError} = require("../expressError");
 const {ensureLoggedIn, ensureAdminOrLoggedInUser, ensureAdmin} = require("../middleware/auth");
 const Job = require("../models/job");
 
+/**
+ * Gets all jobs
+ */
 router.get('/', async ({query: {hasEquity, minSalary, title, ...rest}}, res, next) => {
     try {
         if (Object.keys(rest).length) throw new BadRequestError("invalid query parameters")
@@ -18,6 +21,10 @@ router.get('/', async ({query: {hasEquity, minSalary, title, ...rest}}, res, nex
         return next(e)
     }
 })
+
+/**
+ * GET job by id
+ */
 router.get('/:id', async ({params: {id}}, res, next) => {
     try {
         const job = await Job.get(id)
@@ -26,6 +33,10 @@ router.get('/:id', async ({params: {id}}, res, next) => {
         return next(e)
     }
 })
+
+/**
+ * add a new job. Must be admin
+ */
 router.post('/', ensureAdmin, async ({body}, res, next) => {
     const {valid, errors} = jsonschema.validate(body, jobsNew);
     try {
@@ -39,6 +50,10 @@ router.post('/', ensureAdmin, async ({body}, res, next) => {
         return next(e)
     }
 })
+
+/**
+ * update a job. Must be admin.
+ */
 router.patch('/:id', ensureAdmin, async ({body, params: {id}}, res, next) => {
     const {valid, errors} = jsonschema.validate(body, jobsUpdate);
     try {
@@ -52,6 +67,9 @@ router.patch('/:id', ensureAdmin, async ({body, params: {id}}, res, next) => {
         return next(e)
     }
 })
+/**
+ * delete a job. Must be admin
+ */
 router.delete('/:id', ensureAdmin, async ({params: {id}}, res, next) => {
     try {
         await Job.remove(id)
