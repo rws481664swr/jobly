@@ -2,4 +2,6 @@ for file in ./app.test.js ./config.test.js $(find routes models middleware helpe
   jest $file
   echo "----------< From $file >----------"
   sleep 2
+#  psql jobly_test  <  ./jobly-schema.sql ;
+#  sleep 1
 done

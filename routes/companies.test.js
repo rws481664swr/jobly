@@ -300,6 +300,7 @@ describe("GET /companies", function () {
 
 describe("GET /companies/:handle", function () {
     test("works for anon", async function () {
+        await db.query(`DELETE From jobs`)
         await db.query(`INSERT INTO jobs (company_handle,equity,salary,title) 
         values ('c1','0',4494,'title')`)
         const resp = await request(app).get(`/companies/c1`);

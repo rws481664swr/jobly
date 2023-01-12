@@ -156,6 +156,9 @@ describe("findAll", function () {
                 jobs:[]
             },
         ]);
+
+        await db.query(`DELETE FROM applications where username='u1'`);
+        await db.query(`DELETE FROM jobs`);
     });
 });
 
@@ -170,6 +173,7 @@ describe("get", function () {
             lastName: "U1L",
             email: "u1@email.com",
             isAdmin: false,
+            jobs:[]
         });
     });
     test("works with job app", async function () {
@@ -188,6 +192,9 @@ describe("get", function () {
             isAdmin: false,
             jobs:[job.id]
         });
+
+        await db.query(`DELETE FROM applications where username='u1'`);
+        await db.query(`DELETE FROM jobs`);
     });
 
     test("not found if no such user", async function () {
@@ -289,5 +296,8 @@ describe('apply', () => {
                                               FROM applications
                                               WHERE username = $1`, ['u1'])
         expect(row).toEqual({username: 'u1', job_id: job.id})
+
+        await db.query(`DELETE FROM applications where username='u1'`);
+        await db.query(`DELETE FROM jobs`);
     })
 })

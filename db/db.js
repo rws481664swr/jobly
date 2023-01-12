@@ -7,17 +7,18 @@ process.env.PGPASSWORD=pgp
 
 const connect = ()=>{
     let db;
+    const connectionString=`postgresql:///${getDatabaseUri()}`
     /* istanbul ignore next */
     if (process.env.NODE_ENV === "production") {
         db = new Client({
-            connectionString: getDatabaseUri(),
+            connectionString,
             ssl: {
                 rejectUnauthorized: false
             }
         });
     } else {
         db = new Client({
-            connectionString: getDatabaseUri()
+            connectionString
         });
     }
     db.connect();
