@@ -79,11 +79,11 @@ async function commonBeforeAll() {
 }
 
 async function commonBeforeEach() {
-    await db.query("BEGIN");
+    // await db.query("BEGIN");
 }
 
 async function commonAfterEach() {
-    await db.query("ROLLBACK");
+    // await db.query("ROLLBACK");
 }
 
 async function commonAfterAll() {

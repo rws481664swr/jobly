@@ -15,6 +15,7 @@ const {
     commonAfterAll,
     u1Token, adminToken
 } = require("./_testCommon");
+const Job = require("../models/job");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -159,7 +160,7 @@ describe("GET /users", function () {
                     "isAdmin": true,
                     "lastName": "user",
                     "username": "admin",
-                    jobs:[]
+                    jobs: []
                 },
                 {
                     username: "u1",
@@ -167,7 +168,7 @@ describe("GET /users", function () {
                     lastName: "U1L",
                     email: "user1@user.com",
                     isAdmin: false,
-                    jobs:[]
+                    jobs: []
                 },
                 {
                     username: "u2",
@@ -175,7 +176,7 @@ describe("GET /users", function () {
                     lastName: "U2L",
                     email: "user2@user.com",
                     isAdmin: false,
-                    jobs:[expect.any(Number)]
+                    jobs: [expect.any(Number)]
                 },
                 {
                     username: "u3",
@@ -183,7 +184,7 @@ describe("GET /users", function () {
                     lastName: "U3L",
                     email: "user3@user.com",
                     isAdmin: false,
-                    jobs:[]
+                    jobs: []
                 },
 
             ],
@@ -228,7 +229,7 @@ describe("GET /users/:username", function () {
                 lastName: "U1L",
                 email: "user1@user.com",
                 isAdmin: false,
-                jobs:[]
+                jobs: []
             },
         });
     });
@@ -244,7 +245,7 @@ describe("GET /users/:username", function () {
                 lastName: "U1L",
                 email: "user1@user.com",
                 isAdmin: false,
-                jobs:[]
+                jobs: []
             },
         });
     });
@@ -426,3 +427,59 @@ describe("DELETE /users/:username", function () {
     });
 });
 
+
+describe('apply', () => {
+    test('apply', async () => {
+        const {username} = await User.get('u1')
+        const {job: {id}} = await Job.create({salary: 100000, equity: '0', companyHandle: 'c1', title: 'j1'})
+
+        await request(app)
+            .post(`/users/${username}/jobs/${id}`)
+            .set("authorization", `Bearer ${adminToken}`);
+
+
+        const {body: {user: actual}} = await request(app)
+            .get(`/users/${username}`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(actual).toEqual({
+            username: "u1",
+            firstName: "U1F",
+            lastName: "U1L",
+            email: "user1@user.com",
+            isAdmin: false,
+            jobs: [id]
+        })
+        await db.query(`DELETE
+                        FROM applications`)
+
+    })
+
+    test('apply bad username', async () => {
+        const user = await User.get('u1')
+        const {job} = await Job.create({salary: 100000, equity: '0', companyHandle: 'c1', title: 'j1'})
+
+        const {statusCode, body} = await request(app)
+            .post(`/users/not-a-user/jobs/${job.id}`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(statusCode).toBe(400)
+        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+    })
+    test('apply bad job', async () => {
+        const user = await User.get('u1')
+        const {statusCode, body} = await request(app)
+            .post(`/users/${user.username}/jobs/0`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(statusCode).toBe(400)
+        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+
+    })
+
+    test('apply bad username & bad job', async () => {
+        const {statusCode, body} = await request(app)
+            .post(`/users/not-a-user/jobs/0`)
+            .set("authorization", `Bearer ${adminToken}`);
+        expect(statusCode).toBe(400)
+        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+
+    })
+})
