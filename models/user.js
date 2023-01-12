@@ -211,7 +211,9 @@ class User {
         if (!user) throw new NotFoundError(`No user: ${username}`);
     }
 
-
+    /**
+     * helps user `username` applie for job with id= `id` by inserting into join table `applications`
+     */
     static async apply(username, id) {
         const {rows: [user]} = await db.query(`SELECT *
                                                FROM users
