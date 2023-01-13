@@ -116,6 +116,14 @@ describe("GET /companies", function () {
             .get("/companies")
             .set("authorization", `Bearer ${u1Token}`);
         expect(resp.statusCode).toEqual(500);
+        await db.query(`
+            CREATE TABLE companies (
+                                       handle VARCHAR(25) PRIMARY KEY CHECK (handle = lower(handle)),
+                                       name TEXT UNIQUE NOT NULL,
+                                       num_employees INTEGER CHECK (num_employees >= 0),
+                                       description TEXT NOT NULL,
+                                       logo_url TEXT
+            );`)
     });
 
     describe('query filter params', () => {

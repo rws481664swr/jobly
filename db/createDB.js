@@ -1,5 +1,10 @@
 module.exports = async (db) => {
+
     await db.query(`
+        DROP TABLE applications;
+        DROP TABLE users;
+        DROP TABLE jobs;
+        DROP TABLE companies;
         CREATE TABLE companies
         (
             handle        VARCHAR(25) PRIMARY KEY CHECK (handle = lower(handle)),

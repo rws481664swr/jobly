@@ -41,7 +41,7 @@ afterAll(commonAfterAll)
 describe('jobs routes', () => {
     describe("create", () => {
         test('create', async () => {
-            const {body: {job}} = await request.create({title: 'job4', salary: 100, equity: '0.001', companyHandle:'c1'})
+            const {body: {job}} = await request.create({title: 'job4', salary: 100, equity: '0.001', companyHandle:'c1'},adminToken)
 
             const {rows: [row]} = await db.query(`SELECT id, title, salary, equity, company_handle as "companyHandle"
                                                   FROM jobs
@@ -49,9 +49,7 @@ describe('jobs routes', () => {
             expect(job).toEqual(row)
         })
         test('not enough data - bad request', async () => {
-
-            const {body:{error:{message:[msg]}}} = await request.create({title: 'job4', equity: '0.001', companyHandle: 'c1'})
-
+            const {body:{error:{message:[msg],status}}} = await request.create({title: 'job4', equity: '0.001', companyHandle: 'c1'},adminToken)
             expect(msg).toEqual('instance requires property "salary"')
         })
         test('user cannot create job', async () => {
@@ -135,13 +133,13 @@ describe('jobs routes', () => {
     })
     describe("update", () => {
         test('update', async () => {
-            const {body: {job}, statusCode} = await request.patch(job1.id, {salary: 0})
+            const {body: {job}, statusCode} = await request.patch(job1.id, {salary: 0},adminToken)
             expect(statusCode).toBe(200)
             expect(job).toEqual({...job1, salary: 0})
 
         })
         test('404', async () => {
-            const {statusCode} = await request.patch(0, {salary: 0})
+            const {statusCode} = await request.patch(0, {salary: 0},adminToken)
             expect(statusCode).toBe(404)
         })
         test('user cannot update job', async () => {
@@ -152,7 +150,7 @@ describe('jobs routes', () => {
     })
     describe("remove", () => {
         test('delete', async () => {
-            const {body:{message}, statusCode} = await request.delete(job1.id)
+            const {body:{message}, statusCode} = await request.delete(job1.id,adminToken)
             expect(message).toBe('deleted')
             expect(statusCode).toBe(200)
             const {rows: [row]} = await db.query(`SELECT *
@@ -161,7 +159,7 @@ describe('jobs routes', () => {
             expect(row).toBeUndefined()
         })
         test('404', async () => {
-            const { statusCode} = await request.delete(0)
+            const { statusCode} = await request.delete(0,adminToken)
             expect(statusCode).toBe(404)
 
 

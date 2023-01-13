@@ -212,6 +212,19 @@ describe("GET /users", function () {
             .get("/users")
             .set("authorization", `Bearer ${adminToken}`);
         expect(resp.statusCode).toEqual(500);
+        await db.query(`
+
+            CREATE TABLE users
+            (
+                username   VARCHAR(25) PRIMARY KEY,
+                password   TEXT    NOT NULL,
+                first_name TEXT    NOT NULL,
+                last_name  TEXT    NOT NULL,
+                email      TEXT    NOT NULL
+                    CHECK (position('@' IN email) > 1),
+                is_admin   BOOLEAN NOT NULL DEFAULT FALSE
+            );
+        `)
     });
 });
 
@@ -462,7 +475,7 @@ describe('apply', () => {
             .post(`/users/not-a-user/jobs/${job.id}`)
             .set("authorization", `Bearer ${adminToken}`);
         expect(statusCode).toBe(400)
-        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+        expect(body).toEqual({error: {message: 'invalid username or job id', status: 400}})
     })
     test('apply bad job', async () => {
         const user = await User.get('u1')
@@ -470,7 +483,7 @@ describe('apply', () => {
             .post(`/users/${user.username}/jobs/0`)
             .set("authorization", `Bearer ${adminToken}`);
         expect(statusCode).toBe(400)
-        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+        expect(body).toEqual({error: {message: 'invalid username or job id', status: 400}})
 
     })
 
@@ -479,7 +492,7 @@ describe('apply', () => {
             .post(`/users/not-a-user/jobs/0`)
             .set("authorization", `Bearer ${adminToken}`);
         expect(statusCode).toBe(400)
-        expect(body).toEqual({error:{message:'invalid username or job id',status:400}})
+        expect(body).toEqual({error: {message: 'invalid username or job id', status: 400}})
 
     })
 })

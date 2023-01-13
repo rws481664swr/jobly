@@ -6,6 +6,7 @@ const Company = require("../models/company");
 const {createToken} = require("../helpers/tokens");
 const createDB = require('../db/createDB')
 const dropDB = require('../db/dropDB')
+const {deleteFromCompanies, deleteFromJobs} = require("./_testUtil");
 
 async function commonBeforeAll() {
     // await db.query(createDB)
@@ -75,19 +76,96 @@ async function commonBeforeAll() {
                                 VALUES ('job1', 1000, '0.080', 'c1')
                                 RETURNING id,title,salary,equity,company_handle as "companyHandle"`)).rows[0]
 
-    await User.apply('u2',job1.id)
+    await User.apply('u2', job1.id)
 }
 
 async function commonBeforeEach() {
-    // await db.query("BEGIN");
+
+    await db.query(` DELETE
+                     FROM companies`)
+    await db.query(` DELETE
+                     FROM users`)
+    await db.query(` DELETE
+                     FROM jobs`)
+    await db.query(` DELETE
+                     FROM applications`)
+
+    await Company.create(
+        {
+            handle: "c1",
+            name: "C1",
+            numEmployees: 1,
+            description: "Desc1",
+            logoUrl: "http://c1.img",
+        });
+    await Company.create(
+        {
+            handle: "c2",
+            name: "C2",
+            numEmployees: 2,
+            description: "Desc2",
+            logoUrl: "http://c2.img",
+        });
+    await Company.create(
+        {
+            handle: "c3",
+            name: "C3",
+            numEmployees: 3,
+            description: "Desc3",
+            logoUrl: "http://c3.img",
+        });
+
+    await User.register({
+        username: "u1",
+        firstName: "U1F",
+        lastName: "U1L",
+        email: "user1@user.com",
+        password: "password1",
+        isAdmin: false,
+    });
+    await User.register({
+        username: "u2",
+        firstName: "U2F",
+        lastName: "U2L",
+        email: "user2@user.com",
+        password: "password2",
+        isAdmin: false,
+    });
+    await User.register({
+        username: "u3",
+        firstName: "U3F",
+        lastName: "U3L",
+        email: "user3@user.com",
+        password: "password3",
+        isAdmin: false,
+    });
+    await User.register({
+        username: "admin",
+        firstName: "admin",
+        lastName: "user",
+        email: "admin@user.com",
+        password: "nimda",
+        isAdmin: true,
+    });
+    let job1 = (await db.query(`INSERT INTO jobs (title, salary, equity, company_handle)
+                                VALUES ('job1', 1000, '0.080', 'c1')
+                                RETURNING id,title,salary,equity,company_handle as "companyHandle"`)).rows[0]
+
+    await User.apply('u2', job1.id)
 }
 
 async function commonAfterEach() {
-    // await db.query("ROLLBACK");
 }
 
 async function commonAfterAll() {
-    // await db.query(dropDB)
+    await db.query(` DELETE
+                     FROM companies`)
+    await db.query(` DELETE
+                     FROM users`)
+    await db.query(` DELETE
+                     FROM jobs`)
+    await db.query(` DELETE
+                     FROM applications`)
     await db.end();
 }
 
